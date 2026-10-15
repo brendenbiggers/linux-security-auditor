@@ -15,6 +15,8 @@ checks and network socket inspection.
 - TCP and UDP socket inventory
 - Port 1716 detection for further investigation
 - Security audit report generation using Linux tee
+- Structured security findings with PASS and REVIEW statuses
+- Automated JSON security report generation
 
 ## Technologies
 
@@ -23,6 +25,8 @@ checks and network socket inspection.
 - systemd
 - firewalld
 - iproute2 (ss)
+- JSON
+- Git and GitHub
 
 ## Security Findings
 
@@ -35,7 +39,6 @@ checks and network socket inspection.
 - Structured security findings and severity levels
 - Firewall active-zone verification
 - Authentication log analysis
-- JSON report generation
 - Process identification for listening ports
 
 ## Disclaimer

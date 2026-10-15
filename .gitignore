@@ -12,3 +12,5 @@ auditor_backup.py
 # Environment and secrets
 .env
 .venv/
+
+security-report.json

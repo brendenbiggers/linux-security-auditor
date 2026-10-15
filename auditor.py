@@ -2,6 +2,20 @@ import platform
 import socket
 from datetime import datetime
 import subprocess
+import json
+
+# Structured security report
+security_report = {
+    "system": {},
+    "checks": []
+}
+
+security_report["system"] = {
+    "hostname": socket.gethostname(),
+    "operating_system": platform.system(),
+    "kernel": platform.release(),
+    "scan_time": datetime.now().isoformat()
+}
 
 print("=" * 50)
 print("       LINUX SECURITY AUDITOR")
@@ -30,8 +44,16 @@ try:
 
     if zone == "public":
         print("[PASS] Default firewall zone is public.")
+        finding = "PASS"
     else:
         print("[REVIEW] Default firewall zone is not public.")
+        finding = "REVIEW"
+
+    security_report["checks"].append({
+        "name": "Default Firewall Zone",
+        "status": finding,
+        "result": zone
+    })
 
 except FileNotFoundError:
     print("[ERROR] firewall-cmd was not found.")
@@ -59,10 +81,19 @@ try:
 
     if status == "inactive":
         print("[PASS] SSH server is not running.")
+        finding = "PASS"
     elif status == "active":
         print("[REVIEW] SSH server is running.")
+        finding = "REVIEW"
     else:
         print(f"[INFO] SSH server status: {status}")
+        finding = "INFO"
+
+    security_report["checks"].append({
+        "name": "SSH Server",
+        "status": finding,
+        "result": status
+    })
 
 except FileNotFoundError:
     print("[ERROR] systemctl was not found.")
@@ -84,14 +115,24 @@ try:
 
     print("[+] CHECKING FOR KDE CONNECT")
 
-    if any(
+    port_1716_open = any(
         line.split()[4].endswith(":1716")
         for line in result.stdout.splitlines()[1:]
         if len(line.split()) >= 5
-    ):
-        print("[REVIEW] KDE Connect is listening on port 1716.")
+    )
+
+    if port_1716_open:
+        print("[REVIEW] Port 1716 is listening (KDE Connect uses this port).")
+        finding = "REVIEW"
     else:
-        print("[PASS] No KDE Connect listener found on port 1716.")
+        print("[PASS] No listener found on port 1716.")
+        finding = "PASS"
+
+    security_report["checks"].append({
+        "name": "Network Port 1716",
+        "status": finding,
+        "result": "listening" if port_1716_open else "not listening"
+    })
 
     print(result.stdout)
 
@@ -103,3 +144,9 @@ except subprocess.TimeoutExpired:
 
 except subprocess.CalledProcessError as error:
     print(f"[ERROR] {error.stderr.strip()}")
+
+    # Export structured security report
+with open("security-report.json", "w") as report_file:
+    json.dump(security_report, report_file, indent=4)
+
+print("\n[+] JSON security report generated successfully.")

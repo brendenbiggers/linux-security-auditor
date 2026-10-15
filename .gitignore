@@ -1,0 +1,14 @@
+# Local security reports
+security-report.txt
+*security-report*.txt
+
+# Python temporary files
+__pycache__/
+*.pyc
+
+# Local backups
+auditor_backup.py
+
+# Environment and secrets
+.env
+.venv/
